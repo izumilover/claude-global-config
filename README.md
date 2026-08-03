@@ -5,13 +5,25 @@ Claude Code 전역 설정(`~/.claude/CLAUDE.md`, `~/.claude/settings.json`) 백�
 ## 새 기기/새 환경에서 적용하는 법
 
 ```bash
-git clone <이 저장소 URL> ~/claude-global-config
+git clone https://github.com/izumilover/claude-global-config ~/claude-global-config
 ln -sf ~/claude-global-config/CLAUDE.md ~/.claude/CLAUDE.md
 ln -sf ~/claude-global-config/settings.json ~/.claude/settings.json
 ```
 
 심볼릭 링크로 연결해두면, 이후 `~/.claude/CLAUDE.md`를 수정해도 실제로는 이 저장소 안의 파일이
 바뀌는 것이라 `git add && git commit && git push`로 바로 버전관리 및 다른 기기 동기화가 가능하다.
+
+## bkit 플러그인
+
+`settings.json`에 bkit 마켓플레이스·플러그인 활성화가 이미 선언되어 있어서(`extraKnownMarketplaces`,
+`enabledPlugins`), 위 symlink만 걸면 Claude Code가 다음 실행 시 자동으로 인식·설치를 시도한다.
+
+혹시 자동으로 안 잡히면, Claude Code 세션 안에서 아래 명령을 순서대로 실행한다:
+
+```
+/plugin marketplace add popup-studio-ai/bkit-claude-code
+/plugin install bkit@bkit-marketplace
+```
 
 ## 주의
 
