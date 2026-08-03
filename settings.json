@@ -1,0 +1,15 @@
+{
+  "enabledPlugins": {
+    "bkit@bkit-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "bkit-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "popup-studio-ai/bkit-claude-code"
+      }
+    }
+  },
+  "theme": "dark",
+  "tui": "fullscreen"
+}
