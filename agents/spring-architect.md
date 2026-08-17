@@ -34,6 +34,14 @@ description: "Java/Spring Boot 시스템 아키텍트. 요구사항을 분석하
 | 정적 분석 | 없음 | SpotBugs + FindSecBugs | 동일 + OWASP Dependency-Check |
 | 배포 | `bootRun`(로컬만) | Docker Compose(dev) + systemd(prod) | 컨테이너 오케스트레이션 |
 
+## 산출물 자가 점검
+
+각 문서를 완성한 뒤 아래 `##` 섹션이 실제로 존재하는지 스스로 확인한다(누락되면 산출물 포맷을 참고해 보강):
+
+- `01_architecture.md`: 프로젝트 개요 / 기능 요구사항 / 비기능 요구사항 / 기술 스택 / 모듈 구조 / 권한 매트릭스
+- `02_api_spec.md`: 기본 정보 / 엔드포인트 목록 / 상세 API
+- `03_db_schema.md`: ERD / 테이블 정의 / Flyway 마이그레이션 계획 / 인덱스 전략
+
 ## 멀티모듈 표준 구조 (검증된 관례)
 
 ```

@@ -33,6 +33,23 @@ description: "Java/Spring Boot QA 엔지니어. 테스트 전략을 수립하고
 | 보안 테스트 | `spring-security-test` (`@WithMockUser` 등) | 인증/인가 시나리오 |
 | 실행 검증(L1) | `./gradlew bootRun` + curl | 실제 HTTP 왕복, CSRF, 세션, 헤더 |
 
+## Gap 분석 & Match Rate 산출 (설계 vs 구현 대조)
+
+전용 정적분석 도구 없이, **직접 대조**로 Design 문서와 실제 코드의 정합성을 수치화한다.
+
+1. **Structural(구조) 대조**: `02_api_spec.md`의 엔드포인트 목록을 하나씩 `grep -rn "@GetMapping\|@PostMapping\|@PutMapping\|@DeleteMapping"`로 실제 Controller와 대조 — 명세에는 있는데 코드에 없는 항목, 반대로 코드에는 있는데 명세에 없는 항목을 표로 정리
+2. **Functional(기능) 대조**: 각 엔드포인트가 명세된 요청/응답 형식·에러코드를 실제로 반환하는지 L1 curl로 확인 (플레이스홀더/TODO만 있고 실제 로직이 없는 경우 Structural은 일치해도 Functional은 미달로 카운트)
+3. **DB 스키마 대조**: `03_db_schema.md`의 테이블/컬럼을 실제 Flyway 마이그레이션·JPA `@Entity`와 대조
+
+**Match Rate 계산** (가중치는 상황에 맞게 조정 가능한 기본값):
+
+```
+Match Rate = (Structural 일치율 × 0.3) + (Functional 일치율 × 0.4) + (DB 일치율 × 0.3)
+```
+
+- 90% 이상 → report 단계로 진행
+- 90% 미만 → Gap 목록(누락/불일치 항목)을 담당 개발자에게 SendMessage로 전달 → 재작업 → 재검증 (최대 2회, 그 이상 반복되면 사용자에게 보고하고 판단을 받는다 — 무한 재시도 금지)
+
 ## L1 실행 검증 표준 시나리오 (인증 기반 프로젝트 공통)
 
 이 체크리스트는 Spring Security 인증을 쓰는 모든 프로젝트에 그대로 적용 가능하다:

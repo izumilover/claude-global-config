@@ -11,6 +11,42 @@ Java/Spring Boot 웹앱의 요구사항→설계→백엔드→프론트엔드�
 
 **에이전트 팀** — 5명이 SendMessage로 직접 통신하며 교차 검증한다. Agent Teams(`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)가 꺼져 있으면 먼저 켤 것을 사용자에게 안내한다.
 
+## 상태 추적 & 체크포인트 (경량, 외부 도구 무의존)
+
+무거운 상태관리 시스템(별도 MCP 서버, 커스텀 훅, 자동화 레벨 다이얼 등) 없이 **파일 + git만으로** 충분한 수준의 추적성을 확보한다.
+
+- **상태 파일** — `_workspace/.status.json`:
+  ```json
+  { "feature": "member-admin", "phase": "do", "matchRate": null, "iterationCount": 0, "updatedAt": "2026-01-01T00:00:00Z" }
+  ```
+  각 Phase 전환 시 오케스트레이터가 직접 갱신한다. `phase`는 `plan → design → do → check → report` 중 하나.
+- **체크포인트 = phase 경계마다 git commit** — 별도 스냅샷 포맷을 만들지 않는다. `git commit -m "[{feature}] plan → design"`처럼 phase 전환 시점마다 커밋하면, 되돌리기는 `git revert`/`git reset`으로 git이 이미 가장 잘 하는 일을 그대로 쓰는 것이다. 커밋 전에는 반드시 `git status`/`git diff`로 실제 변경분을 확인한다.
+- **Task 도구 활용** — 여러 단계짜리 작업은 TodoWrite/Task로 진행 상황을 표시한다. 별도 Task 파일 포맷을 새로 만들지 않는다.
+
+## 체크포인트 게이트 (사용자 승인 지점)
+
+아래 4개 지점에서 AskUserQuestion으로 명시적 승인을 받는다 — 조용히 다음 단계로 넘어가지 않는다.
+
+| # | 시점 | 확인 내용 |
+|---|------|----------|
+| 1 | 요구사항 정리 직후 | "이해가 맞나요? 빠진 게 없나요?" |
+| 2 | architect의 3가지 설계안 제시 후 | "Option A/B/C 중 어떤 걸 선택하시겠습니까?" (추천안 명시) |
+| 3 | 구현 착수 직전 | "이 범위(파일 N개, 예상 규모)로 시작해도 되겠습니까?" |
+| 4 | qa-engineer 리뷰 후 🔴/🟡 발견 시 | "지금 모두 수정 / Critical만 수정 / 그대로 진행" 중 선택 |
+
+## 품질 게이트 (경량 지표)
+
+qa-engineer가 Phase 3 직전에 아래 표를 채운다. 자동 수집 도구 없이 **직접 코드/문서를 대조해서 산출**한다.
+
+| 지표 | 산출 방법 | 목표 |
+|------|----------|------|
+| Match Rate | Design §API명세/§DB스키마의 항목 수 대비, 실제 Controller/Entity에 구현된 항목 수 비율 | ≥ 90% |
+| Critical Issue Count | 코드 리뷰에서 발견한 🔴(보안/기능 결함) 개수 | 0 |
+| Convention Compliance | 코드 품질 기준 체크리스트(각 에이전트 파일 §코드 품질 기준) 통과 항목 비율 | ≥ 90% |
+| L1 실행 검증 통과율 | spring-qa-engineer.md의 L1 표준 시나리오 중 실제 curl로 통과한 비율 | 100% (핵심 시나리오는 생략 불가) |
+
+Match Rate가 90% 미만이면 report로 넘어가지 않고 gap 목록을 backend-dev/frontend-dev에게 돌려보낸다(최대 2회 반복, 그 이상은 사용자에게 보고).
+
 ## 에이전트 구성
 
 | 에이전트 | 파일 | 역할 |
