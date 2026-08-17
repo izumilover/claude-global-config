@@ -8,6 +8,7 @@ Claude Code 전역 설정(`~/.claude/CLAUDE.md`, `~/.claude/settings.json`, 재�
 ```bash
 git clone https://github.com/izumilover/claude-global-config ~/claude-global-config
 ln -sf ~/claude-global-config/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf ~/claude-global-config/CLAUDE_spring.md ~/.claude/CLAUDE_spring.md
 ln -sf ~/claude-global-config/settings.json ~/.claude/settings.json
 ln -sf ~/claude-global-config/agents ~/.claude/agents
 mkdir -p ~/.claude/skills
@@ -36,8 +37,9 @@ done
 `agents/spring-*.md` + `skills/spring-webapp`, `skills/spring-security-checklist`,
 `skills/thymeleaf-patterns`는 Java/Spring Boot 웹앱 개발용 범용 하네스(에이전트 팀 5명 +
 오케스트레이터 스킬 1개 + 확장 스킬 2개)다. 특정 프로젝트에 종속되지 않고 어떤 Spring Boot
-프로젝트에서든 "Spring 웹앱 만들어줘" 등으로 트리거해서 재사용한다. 상세 구조는
-`skills/spring-webapp/SKILL.md` 참고.
+프로젝트에서든 "Spring 웹앱 만들어줘" 등으로 트리거해서 재사용한다. 개요는 `CLAUDE_spring.md`,
+상세 워크플로우는 `skills/spring-webapp/SKILL.md` 참고. `CLAUDE.md`에 "Spring 프로젝트면
+`CLAUDE_spring.md`를 먼저 읽는다"는 지침이 걸려 있어 자동으로 안내된다.
 
 ## 주의
 
