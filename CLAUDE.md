@@ -11,6 +11,24 @@
 `~/.claude/CLAUDE_react.md`를 먼저 읽고 그 안내(재사용 가능한 react-* 에이전트/스킬 하네스 목록과
 사용법, 프로젝트 성향 결정, 신규 프로젝트 스캐폴딩 순서)를 따른다.
 
+## 팀 프로젝트에서는 팀 규칙이 최우선
+
+이 파일(`~/.claude/CLAUDE.md`)은 개인 전역 설정이다. 프로젝트에 팀이 정한 규칙(프로젝트 로컬
+`CLAUDE.md`, `CONTRIBUTING.md`, 팀 스타일가이드, 이미 저장소에 설정된 lint/format 규칙 등)이
+있으면, 그 팀 규칙이 이 전역 개인 규칙보다 우선한다 — 한글 주석 규칙, PDCA 문서 명명, 코드
+변경 이력 주석 포맷 등 이 파일에 있는 개인 규칙 전부가 대상이다.
+
+- 새 프로젝트에 들어가거나 시작할 때, 팀 규칙 존재 여부를 먼저 확인한다: 프로젝트 로컬
+  `CLAUDE.md`, `CONTRIBUTING.md`, `.editorconfig`, 기존 코드의 실제 컨벤션(주석 언어, 커밋
+  메시지 포맷 등)을 훑어본다. 이는 "신규 프로젝트는 오케스트레이션 체계를 선택해 프로젝트
+  CLAUDE.md에 고정한다" 규칙과 같은 시점에 같이 처리한다.
+- 충돌이 발견되면(예: 팀이 영문 주석만 쓰기로 했는데 이 파일은 한글 주석을 요구) 팀 규칙을
+  따르고, 어떤 개인 규칙을 왜 적용하지 않았는지 한 줄로 알린다 — 조용히 무시하지 않는다.
+- 팀 규칙 문서가 없고 기존 코드 관례로만 추정해야 하는 상황이 애매하면, 임의로 개인 규칙을
+  적용하지 않고 사용자에게 확인한다.
+- 이 규칙 자체(전역 규칙보다 팀 규칙 우선)는 예외 없이 항상 적용된다 — 팀 규칙이 없는
+  프로젝트(개인 프로젝트 등)에서는 기존처럼 이 파일의 개인 규칙을 그대로 따른다.
+
 ## PDCA Document Naming Convention
 
 PDCA 문서 작성 시 파일명 앞에 순번을 붙인다. 순번은 `.pdca-status.json`의 feature 등록 순서 기준으로 부여한다.
@@ -51,34 +69,39 @@ docs/archive/2026-02/35-pipeline-ux-fix/
 
 ## 코드 변경 이력 주석 (Plan Traceability)
 
-PDCA Plan에 의해 코드가 추가·변경될 때, 해당 코드 블록에 어떤 Plan의 요청으로 처리되었는지 주석으로 명시한다. 이후 다른 Plan에 의해 같은 코드가 변경되면, 변경 이력을 누적하여 기록한다.
+PDCA Plan에 의해 코드가 추가·변경될 때, 해당 코드 블록에 어떤 Plan의 요청으로, 누가 처리했는지 주석으로 명시한다. 이후 다른 Plan(또는 다른 사람)에 의해 같은 코드가 변경되면, 변경 이력을 누적하여 기록한다.
 
 ### 규칙
-- 최초 생성 시: `// [#NN feature-name] 생성` 형태로 주석 추가
-- 이후 변경 시: 기존 주석 아래에 `// [#NN feature-name] 변경내용` 추가
+- 최초 생성 시: `// [#NN feature-name @author] 생성` 형태로 주석 추가
+- 이후 변경 시: 기존 주석 아래에 `// [#NN feature-name @author] 변경내용` 추가
+- `author`는 `git config user.name` 값을 사용한다 — 값이 없으면 사용자에게 한 번 물어보고, 이후
+  같은 프로젝트에서는 반복해서 묻지 않고 그 값을 재사용한다(가능하면 `git config user.name`으로
+  등록해두도록 안내한다)
 - 주석 위치: 변경된 코드 블록의 바로 위 (함수, 상수, JSX 블록 등 의미 단위)
 - 사소한 변경(오타 수정 등)은 생략 가능
 - `NN`은 `.pdca-status.json` 기준 피처 순번
+- 팀 프로젝트에서 팀이 이미 다른 이력 주석 포맷(또는 이 관례 자체를 쓰지 않기)을 정해뒀다면
+  "팀 프로젝트에서는 팀 규칙이 최우선" 규칙에 따라 그쪽을 따른다
 
 ### Examples
 ```typescript
-// [#01 game-blog-automation] 생성
-// [#05 streaming-display-fix] 스트리밍 로직 변경
+// [#01 game-blog-automation @kamiz] 생성
+// [#05 streaming-display-fix @jiyoon] 스트리밍 로직 변경
 const streamHandler = async () => {
   // ...
 };
 ```
 
 ```tsx
-// [#07 blog-management] 생성
-// [#14 trend-search-expand] 검색 기능 추가
-// [#15 rss-title-and-donga-fix] 타이틀 "게임 뉴스" → "RSS" 변경
+// [#07 blog-management @kamiz] 생성
+// [#14 trend-search-expand @minsu] 검색 기능 추가
+// [#15 rss-title-and-donga-fix @jiyoon] 타이틀 "게임 뉴스" → "RSS" 변경
 <h2>RSS</h2>
 ```
 
 ```typescript
-// [#01 game-blog-automation] 생성
-// [#15 rss-title-and-donga-fix] 게임동아 URL 끝에 "/" 추가
+// [#01 game-blog-automation @kamiz] 생성
+// [#15 rss-title-and-donga-fix @jiyoon] 게임동아 URL 끝에 "/" 추가
 const RSS_FEEDS = {
   // ...
 };

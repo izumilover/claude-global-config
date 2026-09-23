@@ -10,8 +10,8 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
 ## 핵심 역할
 
 1. **로컬 개발 환경**: 풀스택 성향이면 Docker Compose로 PostgreSQL(+필요 시 부가 서비스) 구성
-2. **CI 파이프라인**: GitHub Actions로 lint → typecheck → test → build 자동화
-3. **빌드 품질 게이트**: ESLint(`next lint`) + `tsc --noEmit`을 CI에 통합
+2. **CI 파이프라인**: GitHub Actions로 lint → typecheck → test → 보안 스캔 → build 자동화
+3. **빌드 품질 게이트**: ESLint(`next lint`) + `tsc --noEmit` + 의존성 취약점 스캔(`npm audit`) + 시크릿 탐지(gitleaks)를 CI에 통합
 4. **배포 전략**: Vercel을 기본으로 하되, 자체호스팅이 필요하면 `output: 'standalone'` + Docker 멀티스테이지 빌드
 5. **환경 분리**: `local`/`preview`/`production` — Vercel 환경변수 또는 `.env` 프로파일 분리
 
@@ -49,11 +49,15 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v4
+            with: { fetch-depth: 0 }   # gitleaks가 커밋 히스토리를 스캔하려면 필요
           - uses: actions/setup-node@v4
             with: { node-version: '20', cache: 'npm' }
           - run: npm ci
           - run: npm run lint
           - run: npm run typecheck
+          - run: npm audit --audit-level=high
+          - uses: gitleaks/gitleaks-action@v2
+            env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
           - run: npm run test
           - run: npx playwright install --with-deps chromium
           - run: npm run test:e2e
@@ -88,6 +92,17 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
     CMD ["node", "server.js"]
 
 `next.config.js`에 `output: 'standalone'`을 설정해야 위 `server.js`가 생성된다.
+
+## CI 보안 게이트 운영 원칙
+
+- `npm audit --audit-level=high`는 high/critical 취약점이 있으면 CI를 실패시킨다. 해당 패키지에
+  아직 패치가 없어 당장 못 고치는 경우엔 무조건 우회(`--force` 업그레이드로 breaking change
+  유발 등)하지 말고, 실제 영향 범위를 확인한 뒤 사용자에게 보고하고 판단을 받는다(임시로
+  `npm audit` 예외 처리를 하더라도 그 사실과 이유를 리뷰 보고서에 남긴다)
+- gitleaks가 과거 커밋에서 시크릿을 발견하면, 단순히 최신 커밋에서 지우는 것만으로는 부족하다
+  — git 히스토리에 이미 남아있으므로 해당 시크릿은 즉시 회전(재발급)하고, 필요하면 히스토리
+  재작성(`git filter-repo` 등, 팀 저장소라면 다른 팀원과 반드시 사전 협의 후) 여부를 사용자와
+  논의한다
 
 ## 환경변수 체크리스트
 
