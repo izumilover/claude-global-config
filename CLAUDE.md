@@ -5,6 +5,12 @@
 현재 작업 중인 프로젝트가 Java/Spring Boot(Gradle/Maven)로 판단되면 `~/.claude/CLAUDE_spring.md`를
 먼저 읽고 그 안내(재사용 가능한 spring-* 에이전트/스킬 하네스 목록과 사용법)를 따른다.
 
+## Next.js/React 프로젝트 보조 지침
+
+현재 작업 중인 프로젝트가 Next.js/React(`package.json`에 `next` 의존성)로 판단되면
+`~/.claude/CLAUDE_react.md`를 먼저 읽고 그 안내(재사용 가능한 react-* 에이전트/스킬 하네스 목록과
+사용법, 프로젝트 성향 결정, 신규 프로젝트 스캐폴딩 순서)를 따른다.
+
 ## PDCA Document Naming Convention
 
 PDCA 문서 작성 시 파일명 앞에 순번을 붙인다. 순번은 `.pdca-status.json`의 feature 등록 순서 기준으로 부여한다.

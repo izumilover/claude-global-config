@@ -9,6 +9,7 @@ Claude Code 전역 설정(`~/.claude/CLAUDE.md`, `~/.claude/settings.json`, 재�
 git clone https://github.com/izumilover/claude-global-config ~/claude-global-config
 ln -sf ~/claude-global-config/CLAUDE.md ~/.claude/CLAUDE.md
 ln -sf ~/claude-global-config/CLAUDE_spring.md ~/.claude/CLAUDE_spring.md
+ln -sf ~/claude-global-config/CLAUDE_react.md ~/.claude/CLAUDE_react.md
 ln -sf ~/claude-global-config/settings.json ~/.claude/settings.json
 ln -sf ~/claude-global-config/agents ~/.claude/agents
 mkdir -p ~/.claude/skills
@@ -40,6 +41,16 @@ done
 프로젝트에서든 "Spring 웹앱 만들어줘" 등으로 트리거해서 재사용한다. 개요는 `CLAUDE_spring.md`,
 상세 워크플로우는 `skills/spring-webapp/SKILL.md` 참고. `CLAUDE.md`에 "Spring 프로젝트면
 `CLAUDE_spring.md`를 먼저 읽는다"는 지침이 걸려 있어 자동으로 안내된다.
+
+`agents/react-*.md` + `skills/react-webapp`, `skills/react-security-checklist`,
+`skills/nextjs-ui-patterns`는 Next.js/React 웹앱 개발용 범용 하네스(에이전트 팀 5명 +
+오케스트레이터 스킬 1개 + 확장 스킬 2개)다. Spring 하네스와 동일한 구조(아키텍트/백엔드/
+프론트엔드/QA/DevOps)를 App Router 스택으로 재구성했고, 프로젝트 성향(풀스택/BFF·프론트전용/
+정적사이트)에 따라 투입 에이전트와 스캐폴딩 내용이 달라진다. 신규 프로젝트는 오케스트레이터
+스킬(`react-webapp`)의 Phase 1에서 `create-next-app` 등 실제 보일러플레이트까지 생성한 뒤 바로
+설계·구현으로 이어간다. 개요는 `CLAUDE_react.md`, 상세 워크플로우는 `skills/react-webapp/SKILL.md`
+참고. `CLAUDE.md`에 "Next.js/React 프로젝트면 `CLAUDE_react.md`를 먼저 읽는다"는 지침이 걸려
+있어 자동으로 안내된다.
 
 ## 주의
 
