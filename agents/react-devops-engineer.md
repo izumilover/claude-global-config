@@ -44,6 +44,9 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
 
     name: CI
     on: [push, pull_request]
+    permissions:
+      contents: read
+      pull-requests: read   # gitleaks-action이 PR 커밋 목록을 조회하려면 필요 (없으면 403)
     jobs:
       build:
         runs-on: ubuntu-latest
