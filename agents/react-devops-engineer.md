@@ -57,7 +57,11 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
           - run: npm run typecheck
           - run: npm audit --audit-level=high
           - uses: gitleaks/gitleaks-action@v2
-            env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+            env:
+              # `${{ }}` 안에 `{`가 있어서 flow 스타일(`{ K: V }`)로 쓰면 YAML 파싱이 깨진다
+              # (실제로 겪은 이슈 — 워크플로우가 잡 하나 못 뜨고 즉시 실패한다). 이 줄만은
+              # 반드시 block 스타일로 쓴다.
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           - run: npm run test
           - run: npx playwright install --with-deps chromium
           - run: npm run test:e2e
