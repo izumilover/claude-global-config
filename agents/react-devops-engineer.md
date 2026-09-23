@@ -54,7 +54,11 @@ description: "Next.js/React DevOps 엔지니어. Docker Compose 개발 환경, G
           - uses: actions/checkout@v4
             with: { fetch-depth: 0 }   # gitleaks가 커밋 히스토리를 스캔하려면 필요
           - uses: actions/setup-node@v4
-            with: { node-version: '20', cache: 'npm' }
+            # node-version은 로컬 개발 환경(node -v)과 맞춘다 — 실전에서 jsdom 30.x가
+            # Node 20을 지원하지 않아("webidl.util.markAsUncloneable is not a function")
+            # CI에서만 테스트가 깨지는 걸 겪었다. package.json의 devDependencies(jsdom 등)
+            # engines 요구사항과 항상 대조해서 버전을 정한다.
+            with: { node-version: '22', cache: 'npm' }
           - run: npm ci
           - run: npm run lint
           - run: npm run typecheck
